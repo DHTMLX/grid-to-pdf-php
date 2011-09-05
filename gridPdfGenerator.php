@@ -184,8 +184,10 @@ class gridPdfGenerator {
 			for ($j = 0; $j < count($widths); $j++) {
 				if ((isset($this->columns[$i][$j]))&&($this->columns[$i][$j]['rowspan'] != '')&&(!isset($this->columns[$i][$j]['rowspanPos']))) {
 					for ($k = 1; $k < $this->columns[$i][$j]['rowspan']; $k++) {
-						$this->columns[$i + $k][$j]['rowspanPos'] = $this->columns[$i][$j]['rowspan'] - $k;
-						$this->columns[$i + $k][$j]['rowspan'] = $this->columns[$i][$j]['rowspan'];
+						if (isset($this->columns[$i + $k][$j])) {
+							$this->columns[$i + $k][$j]['rowspanPos'] = $this->columns[$i][$j]['rowspan'] - $k;
+							$this->columns[$i + $k][$j]['rowspan'] = $this->columns[$i][$j]['rowspan'];
+						}
 					}
 					$this->columns[$i][$j]['rowspanPos'] = 'top';
 				}
