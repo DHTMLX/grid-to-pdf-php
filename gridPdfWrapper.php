@@ -151,7 +151,7 @@ class gridPdfWrapper {
 							$height = $headerHeight;
 						}
 						// draws header cell
-						$this->cb->Cell($width, $height, $columns[$i][$j]['text'], 1, 0, 'C', 1);
+						$this->cb->MultiCell($width, $height, $columns[$i][$j]['text'], 1, 'C', 1, 0);
 					} else {
 						// add width of cell that is part of cell with rowspan
 						$width = $this->pageWidth*$columns[$i][$j]['width']/$columns[0]['width'];
