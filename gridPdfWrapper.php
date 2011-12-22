@@ -38,6 +38,7 @@ class TCPDFExt extends TCPDF {
 class gridPdfWrapper {
 
 	private $imgsPath = './imgs/';
+	private $fontFamily = 'freesans';
 	private $noPages = false;
 	private $currentRow = 0;
 
@@ -114,12 +115,12 @@ class gridPdfWrapper {
 		$this->cb->SetKeywords('');
 		
 		// sets font family and size
-		$this->cb->SetFont('freesans', '', $this->fontSize);
+		$this->cb->SetFont($this->fontFamily, '', $this->fontSize);
 	}
 
 
 	// draws grid header
-	public function headerDraw($headerHeight, $columns, $summaryWidth, $headerTextColor, $bgColor, $lineColor) {
+	public function headerDraw($headerHeight, $columns, $summaryWidth, $headerTextColor, $bgColor, $lineColor, $multiline = false) {
 		$this->columns = $columns;
 		$this->bgColor = $this->convertColor($bgColor);
 		$this->lineColor = $this->convertColor($lineColor);
@@ -129,6 +130,7 @@ class gridPdfWrapper {
 		$this->cb->SetLineStyle($this->lineStyle);
 		$this->cb->SetFillColor($this->bgColor['R'], $this->bgColor['G'], $this->bgColor['B']);
 		$this->cb->SetTextColor($this->headerTextColor['R'], $this->headerTextColor['G'], $this->headerTextColor['B']);
+		$this->multiline = $multiline;
 
 		$this->cb->setX($this->offsetLeft);
 		$this->cb->setY($this->offsetTop, false);
@@ -151,7 +153,13 @@ class gridPdfWrapper {
 							$height = $headerHeight;
 						}
 						// draws header cell
-						$this->cb->MultiCell($width, $height, $columns[$i][$j]['text'], 1, 'C', 1, 0);
+						$value = $columns[$i][$j]['text'];
+						if ($this->multiline) {
+							$this->cb->MultiCell($width, $height, $value, 1, 'C', 1, 0);
+						} else {
+							$value = $this->text_wrap($value, $width - 2);
+							$this->cb->Cell($width, $height, $value, 1, 0, 'C', 1);
+						}
 					} else {
 						// add width of cell that is part of cell with rowspan
 						$width = $this->pageWidth*$columns[$i][$j]['width']/$columns[0]['width'];
@@ -194,7 +202,14 @@ class gridPdfWrapper {
 						}
 						if ($width > 0) {
 							// draws footer cell
-							$this->cb->Cell($width, $height, $this->footerColumns[$i][$j]['text'], 1, 0, 'C', 1);
+//							$this->cb->Cell($width, $height, $this->footerColumns[$i][$j]['text'], 1, 0, 'C', 1);
+							$value = $this->footerColumns[$i][$j]['text'];
+							if ($this->multiline) {
+								$this->cb->MultiCell($width, $height, $value, 1, 'C', 1, 0, '', '', true, 0, false, true, 0);
+							} else {
+								$value = $this->text_wrap($value, $width - 2);
+								$this->cb->Cell($width, $height, $value, 1, 0, 'C', 1);
+							}
 						}
 					} else {
 						// add width of cell that is part of cell with rowspan
@@ -254,7 +269,7 @@ class gridPdfWrapper {
 
 				$bold = ($this->rows[$this->currentRow][$j]['bold']) ? 'b' : '';
 				$italic = ($this->rows[$this->currentRow][$j]['italic']) ? 'i' : '';
-				$this->cb->SetFont('freesans'.$bold.$italic, '', $this->fontSize);
+				$this->cb->SetFont($this->fontFamily.$bold.$italic, '', $this->fontSize);
 
 				$align = $this->rows[$this->currentRow][$j]['align'];
 				if ($align == false)
@@ -473,6 +488,16 @@ class gridPdfWrapper {
 		} else {
 			return 'transparent';
 		}
+	}
+
+	private function text_wrap($text, $width) {
+		if ($this->cb->getStringWidth($text) < $width) return $text;
+		while ($this->cb->getStringWidth($text."...") > $width) {
+			if (strlen($text) === 0) return "";
+			$text = substr($text, 0, strlen($text) - 1);
+		}
+		return $text."...";
+
 	}
 
 }

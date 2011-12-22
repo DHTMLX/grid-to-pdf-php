@@ -13,6 +13,7 @@ class gridPdfGenerator {
 	public $fontSize = 8;
 	public $dpi = 96;
 	public $strip_tags = false;
+	public $multiline = false;
 
 	public $bgColor = 'D1E5FE';
 	public $lineColor = 'A4BED4';
@@ -427,7 +428,7 @@ class gridPdfGenerator {
 		$this->wrapper->setPageSize($offsetTop, $offsetRight, $offsetBottom, $offsetLeft);
 
 		// prints grid header
-		$this->wrapper->headerDraw($this->headerHeight, $this->columns, $this->summaryWidth, $this->headerTextColor, $this->bgColor, $this->lineColor);
+		$this->wrapper->headerDraw($this->headerHeight, $this->columns, $this->summaryWidth, $this->headerTextColor, $this->bgColor, $this->lineColor, $this->multiline);
 		// prints grid footer
 		$this->wrapper->footerDraw($this->headerHeight, $this->footerColumns);
 		// prints grid values
