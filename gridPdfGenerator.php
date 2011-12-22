@@ -7,6 +7,7 @@ class gridPdfGenerator {
 	public $minOffsetLeft = 10;
 	public $minOffsetRight = 10;
 	public $headerHeight = 7;
+	public $footerHeight = 7;
 	public $rowHeight = 5;
 	public $minColumnWidth = 13;
 	public $pageNumberHeight = 10;
@@ -40,6 +41,8 @@ class gridPdfGenerator {
 	private $pageFooter = false;
 	private $coll_options = Array();
 	private $hiddenCols = Array();
+	private $headerTotal = 0;
+	private $footerTotal = 0;
 
 	// print grid
 	public function printGrid($xml) {
@@ -195,6 +198,10 @@ class gridPdfGenerator {
 			}
 		}
 		$this->widths = $widths;
+		
+		
+		$this->headerTotal = is_array($this->headerHeight) ? array_sum($this->headerHeight) : $this->headerHeight;
+		$this->footerTotal = is_array($this->footerHeight) ? array_sum($this->footerHeight) : $this->footerHeight;
 	}
 
 
@@ -369,7 +376,7 @@ class gridPdfGenerator {
 		if (($this->footer)||($this->pageFooter)) {
 			$pageHeight -= $this->footerImgHeight;
 		}
-		$numRows = floor(($pageHeight - $this->headerHeight)/$this->rowHeight);
+		$numRows = floor(($pageHeight - $this->headerTotal - $this->footerTotal)/$this->rowHeight);
 		// denies page numbers if dpcument have one page
 		if ($numRows >= count($this->rows)) {
 			$this->wrapper->setNoPages();
@@ -413,7 +420,7 @@ class gridPdfGenerator {
 		// calculates page height without top and bottom offsets
 		$pageHeight = $this->wrapper->getPageHeight() - $offsetTop - $offsetBottom - $this->minOffsetTop - $this->minOffsetTop;
 		// calculates rows number on current page
-		$numRows = floor(($pageHeight - $this->headerHeight*count($this->columns) - $this->headerHeight*count($this->footerColumns))/$this->rowHeight);
+		$numRows = floor(($pageHeight - $this->headerTotal*count($this->columns) - $this->footerTotal*count($this->footerColumns))/$this->rowHeight);
 		// check if it's last page
 		$lastPage = ((count($this->rows) - $startRow) <= $numRows);
 
@@ -430,7 +437,7 @@ class gridPdfGenerator {
 		// prints grid header
 		$this->wrapper->headerDraw($this->headerHeight, $this->columns, $this->summaryWidth, $this->headerTextColor, $this->bgColor, $this->lineColor, $this->multiline);
 		// prints grid footer
-		$this->wrapper->footerDraw($this->headerHeight, $this->footerColumns);
+		$this->wrapper->footerDraw($this->footerHeight, $this->footerColumns);
 		// prints grid values
 		$rowsNum = $this->wrapper->gridDraw($this->rowHeight, $this->rows, $this->widths, $startRow, $numRows, $this->scaleOneColor, $this->scaleTwoColor, $this->profile);
 

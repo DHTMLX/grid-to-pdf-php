@@ -137,6 +137,11 @@ class gridPdfWrapper {
 
 		// circle for every header row
 		for ($i = 0; $i < count($columns); $i++) {
+			if (is_array($headerHeight)) {
+				$lineHeight = (isset($headerHeight[$i])) ? $headerHeight[$i] : 7;
+			} else {
+				$lineHeight = $headerHeight;
+			}
 			// circle for every header cell in row
 			for ($j = 0; $j < count($columns[$i]) - 1; $j++) {
 				// check if cell is not part of colspan cell
@@ -148,9 +153,9 @@ class gridPdfWrapper {
 
 						// calculation height: if cell hasn't rowspan its height = rowHeight, else its height = rowspan*rowHeight;
 						if ($columns[$i][$j]['rowspan'] != '') {
-							$height = $columns[$i][$j]['rowspan']*$headerHeight;
+							$height = $columns[$i][$j]['rowspan']*$lineHeight;
 						} else {
-							$height = $headerHeight;
+							$height = $lineHeight;
 						}
 						// draws header cell
 						$value = $columns[$i][$j]['text'];
@@ -168,7 +173,7 @@ class gridPdfWrapper {
 				}
 			}
 			// sets new row
-			$this->cb->setY($this->cb->getY() + $headerHeight);
+			$this->cb->setY($this->cb->getY() + $lineHeight);
 		}
 	}
 
@@ -177,6 +182,7 @@ class gridPdfWrapper {
 	public function footerDraw($footerHeight, $columns) {
 		$this->footerColumns = $columns;
 		$this->footerHeight = $footerHeight;
+		$this->footerTotal = is_array($this->footerHeight) ? array_sum($this->footerHeight) : $this->footerHeight;
 	}
 
 
@@ -185,10 +191,15 @@ class gridPdfWrapper {
 		$this->lineStyle = Array('width' => 0.1, 'cap' => 'round', 'join' => 'round', 'dash' => '0', 'color' => $this->lineColor);
 		$this->cb->SetLineStyle($this->lineStyle);
 		$this->cb->SetFillColor($this->bgColor['R'], $this->bgColor['G'], $this->bgColor['B']);
-		$yPos = $this->cb->getPageHeight() - $this->offsetBottom - $this->footerHeight*count($this->footerColumns);
+		$yPos = $this->cb->getPageHeight() - $this->offsetBottom - $this->footerTotal*count($this->footerColumns);
 
 		if ($this->footerColumns) {
 			for ($i = 0; $i < count($this->footerColumns); $i++) {
+				if (is_array($this->footerHeight)) {
+					$lineHeight = (isset($this->footerHeight[$i])) ? $this->footerHeight[$i] : 7;
+				} else {
+					$lineHeight = $this->footerHeight;
+				}
 				for ($j = 0; $j < count($this->footerColumns[$i]) - 1; $j++) {
 					if (((isset($this->footerColumns[$i][$j]['rowspanPos']))&&($this->footerColumns[$i][$j]['rowspanPos'] == 'top'))||(!isset($this->footerColumns[$i][$j]['rowspanPos']))) {
 						// calculation width of cell
@@ -196,9 +207,9 @@ class gridPdfWrapper {
 
 						// calculation height: if cell hasn't rowspan its height = rowHeight, else its height = rowspan*rowHeight;
 						if ($this->footerColumns[$i][$j]['rowspan'] != '') {
-							$height = $this->footerColumns[$i][$j]['rowspan']*$this->footerHeight;
+							$height = $this->footerColumns[$i][$j]['rowspan']*$lineHeight;
 						} else {
-							$height = $this->footerHeight;
+							$height = $lineHeight;
 						}
 						if ($width > 0) {
 							// draws footer cell
@@ -217,7 +228,7 @@ class gridPdfWrapper {
 						$this->cb->setX($this->cb->getX() + $width);
 					}
 				}
-				$this->cb->setY($this->cb->getY() + $this->footerHeight);
+				$this->cb->setY($this->cb->getY() + $lineHeight);
 			}
 		}
 	}
@@ -242,7 +253,7 @@ class gridPdfWrapper {
 		$printedRowsHeight = 0;
 		$printedRowsNum = 0;
 		$last = '0';
-		$limitY = $this->cb->getPageHeight() - $this->offsetBottom - count($this->footerColumns)*$this->footerHeight;
+		$limitY = $this->cb->getPageHeight() - $this->offsetBottom - count($this->footerColumns)*$this->footerTotal;
 		while (($this->currentRow < count($this->rows))&&($this->cb->getY() + $this->getMaxRowHeight($this->currentRow) <= $limitY)) {
 			$height = $this->getMaxRowHeight($this->currentRow);
 
