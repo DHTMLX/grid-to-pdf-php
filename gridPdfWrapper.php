@@ -260,11 +260,7 @@ class gridPdfWrapper {
 			// circle for drawing cells
 			for ($j = 0; $j < count($this->rows[$this->currentRow]); $j++) {
 				// to start next cell from new line or not
-				if ($j == count($rows[$this->currentRow]) - 1) {
-					$newLn = 1;
-				} else {
-					$newLn = 0;
-				}
+				$newLn = 0;
 				// calculation positions and sizes for cell
 				$width = $this->pageWidth*$this->widths[$j]/$this->summaryWidth;
 				$xImg = $this->cb->getX();
@@ -298,7 +294,8 @@ class gridPdfWrapper {
 						break;
 				}
 				// draws cell
-				$this->cb->MultiCell($width, $height, $value, 1, $align, 1, $newLn, '', '', true, 0);
+				if ($width > 0)
+					$this->cb->MultiCell($width, $height, $value, 1, $align, 1, $newLn, '', '', true, 0);
 				$x = $this->cb->getX();
 				$y = $this->cb->getY();
 				// draws image if cell type is checkbox or radio-button
@@ -333,6 +330,7 @@ class gridPdfWrapper {
 					$this->cb->setY($y, false);
 				}
 			}
+			$this->cb->setY($y + $height);
 			$printedRowsHeight += $height;
 			$printedRowsNum++;
 			$this->currentRow++;
