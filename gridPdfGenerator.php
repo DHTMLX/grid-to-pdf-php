@@ -172,7 +172,7 @@ class gridPdfGenerator {
 			for ($j = 0; $j < count($widths); $j++) {
 				if ($this->columns[$i][$j]['colspan'] != '') {
 					$w = $widths[$j];
-					for ($k = 1; $k < $this->columns[$i][$j]['colspan']; $k++) {
+					for ($k = 1; $k < $this->columns[$i][$j]['colspan'] && $k+$j < count($widths); $k++) {
 						$w += $widths[$j + $k];
 						$this->columns[$i][$j + $k]['width'] = 0;
 					}
@@ -291,6 +291,7 @@ class gridPdfGenerator {
 		$i = 0;
 		foreach ($rows as $row) {
 			$rowArr = Array();
+			$level = (int) $row->attributes()->level;
 			$cells = $row->cell;
 			$k = 0;
 			foreach ($cells as $cell) {
@@ -324,6 +325,8 @@ class gridPdfGenerator {
 				$cell_p['bold'] = (isset($cell->attributes()->bold) && $cell->attributes()->bold == 'bold') ? true : false;
 				$cell_p['italic'] = (isset($cell->attributes()->italic) && $cell->attributes()->italic == 'italic') ? true : false;
 				$cell_p['align'] = isset($cell->attributes()->align) ? $cell->attributes()->align : false;
+				if ($level > 0 && $this->columns[0][$k]['type'] === 'tree')
+					$cell_p['text'] = str_repeat("        ", $level).$cell_p['text'];
 				$rowArr[] = $cell_p;
 				$k++;
 			}
