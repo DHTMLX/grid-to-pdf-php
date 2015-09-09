@@ -388,12 +388,16 @@ class gridPdfGenerator {
 		$rows = Array();
 		$pageNumber = 1;
 		$startRow = 0;
-		// circle for printing all pages
-		while ($startRow < count($this->rows)) {
-			$numRows = $this->printGridPage($startRow, $pageNumber);
-			$startRow += $numRows;
-			if ($numRows == 0) $startRow++;
-			$pageNumber++;
+		if (count($this->rows) === 0)
+			$this->printGridPage(0, 1);
+		else {
+			// circle for printing all pages
+			while ($startRow < count($this->rows)) {
+				$numRows = $this->printGridPage($startRow, $pageNumber);
+				$startRow += $numRows;
+				if ($numRows == 0) $startRow++;
+				$pageNumber++;
+			}
 		}
 		
 		// outputs PDF in browser
