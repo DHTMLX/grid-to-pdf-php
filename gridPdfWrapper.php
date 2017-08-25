@@ -75,7 +75,7 @@ class gridPdfWrapper {
 	private $profile;
 	private $dpi;
 
-	public function gridPdfWrapper($offsetTop, $offsetRight, $offsetBottom, $offsetLeft, $orientation='P', $fontSize = 8, $dpi = 72, $lang) {
+	function __construct($offsetTop, $offsetRight, $offsetBottom, $offsetLeft, $orientation='P', $fontSize = 8, $dpi = 72, $lang) {
 		// pdf-component initialization
 		$this->cb = new TCPDFExt($orientation, 'mm', 'A4', true, 'UTF-8', false); 
 
