@@ -145,7 +145,7 @@ class gridPdfGenerator {
 				} else {
 					$columnArr['text'] = trim((string) $column);
 				}
-				$columnArr['width'] = trim((string) $column->attributes()->width);
+				$columnArr['width'] = trim((int) $column->attributes()->width);
 				$columnArr['type'] = trim((string) $column->attributes()->type);
 				$columnArr['align'] = trim((string) $column->attributes()->align);
 				$columnArr['colspan'] = trim((string) $column->attributes()->colspan);
